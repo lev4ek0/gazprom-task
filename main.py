@@ -22,15 +22,10 @@ def get_fil_sum(df, name):
     for index, row in df.iterrows():
         sort_by.add((row[name], 0))
 
-    sort_by_and_summ = set()
-    for elem in sort_by:
-        sort_by_and_summ.add((elem[0], df.loc[df[name] == elem[0], 'ЛКВ (базовый вариант)'].sum()))
-    sort_by = []
-    summ = []
-    for i in sort_by_and_summ:
-        sort_by.append(i[0])
-        summ.append(i[1])
-    return sort_by, summ
+    sort_by = list(sort_by)
+    for k, elem in enumerate(sort_by):
+        sort_by[k] = (elem[0], df.loc[df[name] == elem[0], 'ЛКВ (базовый вариант)'].sum())
+    return [i[0] for i in sort_by], [i[1] for i in sort_by]
 
 
 def get_pie(name, data1, data2, data3, step):
@@ -126,7 +121,6 @@ def result():
         df = pd.read_excel(filename, "Рейтинг", usecols="B,D,E,AA", header=8)
         df.drop([0], axis=0, inplace=True)
         df.sort_values(by=['Интегральный рейтинг'], inplace=True, ascending=True)
-        print(df)
         df1 = df.copy()
         for index, row in df.iterrows():
             tmp = df1.at[index, 'ЛКВ (базовый вариант)']
@@ -139,7 +133,6 @@ def result():
             df2.at[index, 'ЛКВ (базовый вариант)'] = tmp * percent / 100
             if df2['ЛКВ (базовый вариант)'].sum() < summ + step:
                 break
-        print(step)
         get_pie(variable2.get(), df, df1, df2, step)
     else:
         pass
